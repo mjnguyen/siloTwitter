@@ -9,6 +9,7 @@
 #import "MNLoginViewController.h"
 #import "MNDatabaseManager.h"
 #import "TSMessage.h"
+#import "MBProgressHUD.h"
 
 @implementation MNLoginViewController
 
@@ -26,6 +27,7 @@
                                    action:@selector(dismissKeyboard:)];
 
     [self.view addGestureRecognizer: tap];
+    [self.spinner stopAnimating];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -40,31 +42,38 @@
 - (IBAction)registerUser:(id)sender {
     // first find if user already exists
     MNDatabaseManager *dbMgr = [MNDatabaseManager sharedManager];
-    if ([dbMgr findUserForUsername:self.registerUsernameField.text]) {
-        // user exists, display error message and refocus to username field
-        [self.registerUsernameField becomeFirstResponder];
-
-        [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"Username already exists. Please try another one." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
-        return;
-    }
 
     // check to make sure the passwords are equivalent
     if (![self.registerPassword1Field.text isEqualToString: self.registerPassword2Field.text]) {
-        [TSMessage showNotificationWithTitle:@"Passwords do not match." type:TSMessageNotificationTypeError];
+        [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"Passwords do not match." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
     }
     else if ([self.registerFullNameField.text length] < 1) {
         [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"Full name must not be empty." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
     }
     else if ([self.registerUsernameField.text length] < 5) {
         [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"username must be at least 5 letters." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+    }
+    else {
 
-    } else {
-        // basic check is good.  Now register the user and dismiss the screen
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.labelText = @"Registering Account . . .";
+
         __weak MNLoginViewController *weakSelf = self;
-
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [dbMgr createUser:weakSelf.registerUsernameField.text withName:weakSelf.registerFullNameField.text andPassword:weakSelf.registerPassword1Field.text];
-            [weakSelf.delegate loginViewControllerDidRegisterUserSuccessfully:self];
+            [hud hide:YES];
+            if ([dbMgr findUserForUsername:self.registerUsernameField.text]) {
+                // user exists, display error message and refocus to username field
+                [weakSelf.registerUsernameField becomeFirstResponder];
+
+                [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"Username already exists. Please try another one." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+            }
+
+            else {
+                // basic check is good.  Now register the user and dismiss the screen
+                [dbMgr createUser:weakSelf.registerUsernameField.text withName:weakSelf.registerFullNameField.text andPassword:weakSelf.registerPassword1Field.text];
+                [weakSelf.delegate loginViewControllerDidRegisterUserSuccessfully:weakSelf];
+            }
+
         });
     }
 }
@@ -74,8 +83,11 @@
     MNDatabaseManager *dbMgr = [MNDatabaseManager sharedManager];
     User *user = [dbMgr findUserForUsername:self.usernameField.text];
     __weak MNLoginViewController *weakSelf = self;
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText = @"Logging you in . . .";
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [hud hide:YES];
         if (user != nil) {
             [weakSelf loginViewControllerDidLoginSuccessfully:weakSelf];
         }

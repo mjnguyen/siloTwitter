@@ -114,25 +114,30 @@
 
     NSArray *results = [moc executeFetchRequest:request error:&error];
 
+    if (error != nil) {
+        NSLog(@"Error happened while getting user [%@]\nError: %@", username, [error localizedDescription]);
+        return nil;
+    }
     return [results firstObject];
 
 }
 
 -(void)saveTweet:(UserTweet *)userTweet {
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-    [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
+    NSManagedObjectContext *moc = app.managedObjectContext; 
 
     User *user = [self findUserForUsername:userTweet.username];
     if (user == nil) {
         // send out a notification that
         return;
     }
+
     NSManagedObjectID *userContextId = [user objectID];
+    NSError *error = nil;
 
     // now that we have a valid user create the tweet and save it to the database
     Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([Tweet class]) inManagedObjectContext:moc];
-    tweet.user = [moc objectRegisteredForID:userContextId];
+    tweet.user = (User *)[moc existingObjectWithID:userContextId error:&error];
     tweet.message = userTweet.message;
 
     if ([userTweet.tags count] > 0) {
@@ -148,7 +153,6 @@
         [tweet setHashtags:tagsToAdd];
     }
 
-    NSError *error = nil;
     if (![moc save:&error]) {
         NSLog(@"Error while saving Tweet! %@", [error localizedDescription]);
         // Ideally, have a error handling system rather than just using straight notificiations.
