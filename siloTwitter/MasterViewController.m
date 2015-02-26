@@ -45,6 +45,7 @@
     UIAlertView *popup = [[UIAlertView alloc] initWithTitle:@"Tweet it!" message:@"Tell me your thoughts!" delegate:self cancelButtonTitle:@"Nevermind" otherButtonTitles:@"OK", nil];
     [popup setAlertViewStyle:UIAlertViewStylePlainTextInput];
 
+    [popup show];   
 
 }
 
