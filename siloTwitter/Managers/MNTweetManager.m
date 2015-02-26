@@ -60,7 +60,7 @@
             NSError *error = nil;
             if (tweets == nil) {
                 NSDictionary *errorDetails = @{ @"errorCode": @1000,
-                                                @"description": @"Request for Tweets for user failed unexpectedly"
+                                                NSLocalizedDescriptionKey: @"Request for Tweets for user failed unexpectedly"
                                                 };
                 error = [NSError errorWithDomain:@"Request Error" code:1000 userInfo:errorDetails];
             }
@@ -70,6 +70,39 @@
     });
 }
 
+-(void)registerUser:(MNUser *)newUser withCompletionBlock:(MNTweetResponseBlock)callback {
+    MNDatabaseManager *mgr = [MNDatabaseManager sharedManager];
+    [mgr createUser:newUser.username withName:newUser.fullname andPassword:newUser.password];
+    if (callback) {
+        callback(newUser, nil);
+    }
+}
 
+-(void)loginUser:(MNUser *)user withCompletionBlock:(MNTweetResponseBlock)callback {
+    // first find the user
+    MNDatabaseManager *mgr = [MNDatabaseManager sharedManager];
+    User *dbUser = [mgr findUserForUsername:user.username];
+    NSDictionary *userInfo = nil;
+    NSError *error = nil;
 
+    if (dbUser == nil) {
+        if (callback) {
+            userInfo = @{ NSLocalizedDescriptionKey: @"User doesn't exist.",
+                                        @"code" : @3000
+                                        };
+            error = [NSError errorWithDomain:@"Login" code:3000 userInfo:userInfo];
+        }
+    }
+
+    else if (![dbUser.password isEqualToString:user.password]) {
+        userInfo = @{ NSLocalizedDescriptionKey: @"username/password do not match.",
+                      @"code" : @4000
+                      };
+        error = [NSError errorWithDomain:@"Login" code:4000 userInfo:userInfo];
+    }
+    
+    if (callback) {
+        callback(user, error);
+    }
+}
 @end

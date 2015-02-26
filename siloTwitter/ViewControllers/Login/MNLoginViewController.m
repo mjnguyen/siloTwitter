@@ -8,8 +8,10 @@
 
 #import "MNLoginViewController.h"
 #import "MNDatabaseManager.h"
+#import "MNTweetManager.h"
 #import "TSMessage.h"
 #import "MBProgressHUD.h"
+#import "MNUser.h"
 
 @implementation MNLoginViewController
 
@@ -42,6 +44,7 @@
 - (IBAction)registerUser:(id)sender {
     // first find if user already exists
     MNDatabaseManager *dbMgr = [MNDatabaseManager sharedManager];
+    MNTweetManager *tweetMgr = [MNTweetManager sharedManager];
 
     // check to make sure the passwords are equivalent
     if (![self.registerPassword1Field.text isEqualToString: self.registerPassword2Field.text]) {
@@ -58,6 +61,11 @@
         MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         hud.labelText = @"Registering Account . . .";
 
+        MNUser *newUser = [[MNUser alloc] init];
+        newUser.username = self.registerUsernameField.text;
+        newUser.fullname = self.registerFullNameField.text;
+        newUser.password = self.registerPassword1Field.text;
+
         __weak MNLoginViewController *weakSelf = self;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [hud hide:YES];
@@ -70,8 +78,9 @@
 
             else {
                 // basic check is good.  Now register the user and dismiss the screen
-                [dbMgr createUser:weakSelf.registerUsernameField.text withName:weakSelf.registerFullNameField.text andPassword:weakSelf.registerPassword1Field.text];
-                [weakSelf.delegate loginViewControllerDidRegisterUserSuccessfully:weakSelf];
+                [tweetMgr registerUser:newUser withCompletionBlock:^(id response, NSError *error) {
+                    [weakSelf.delegate loginViewControllerDidRegisterUserSuccessfully:weakSelf];
+                }];
             }
 
         });
@@ -79,22 +88,37 @@
 }
 
 - (IBAction)loginUser:(id)sender {
+    // do some validation of form first
+    if (!([self.usernameField.text length] > 0 && [self.passwordField.text length] > 0)) {
+        // something is blank
+        NSString *errorMessage = @"Username or password can not be blank";
+        [TSMessage showNotificationInViewController:self title:@"Login Failed" subtitle:errorMessage type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+        return;
+    }
+
     // first find if user already exists
-    MNDatabaseManager *dbMgr = [MNDatabaseManager sharedManager];
-    User *user = [dbMgr findUserForUsername:self.usernameField.text];
     __weak MNLoginViewController *weakSelf = self;
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     hud.labelText = @"Logging you in . . .";
+    MNTweetManager *mgr = [MNTweetManager sharedManager];
+    MNUser *user = [[MNUser alloc] init];
+    user.username = self.usernameField.text;
+    user.password = self.passwordField.text;
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [hud hide:YES];
-        if (user != nil) {
-            [weakSelf loginViewControllerDidLoginSuccessfully:weakSelf];
-        }
-        else {
-            // login failed.
-            [TSMessage showNotificationInViewController:self title:@"Login Failed" subtitle:@"Username/password do not match." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
-        }
+        [mgr loginUser:user withCompletionBlock:^(id user, NSError *error) {
+            [hud hide:YES];
+            if (error == nil) {
+                [weakSelf loginViewControllerDidLoginSuccessfully:weakSelf];
+            }
+            else {
+                // login failed.
+                NSString *errorMessage = [error localizedDescription];
+                [TSMessage showNotificationInViewController:self title:@"Login Failed" subtitle:errorMessage type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+            }
+
+        }];
+
     });
 
 }

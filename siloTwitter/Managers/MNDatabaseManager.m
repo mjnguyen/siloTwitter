@@ -41,8 +41,7 @@
 - (void)createUser: (NSString *)username withName: (NSString *)fullName andPassword: (NSString *)password {
     NSError *error = nil;
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-    [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
+    NSManagedObjectContext *moc = app.managedObjectContext;
 
     User *newUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([User class]) inManagedObjectContext:moc];
     [newUser setUsername:username];
@@ -109,8 +108,7 @@
     [request setPredicate:userFilter];
 
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
-    [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
+    NSManagedObjectContext *moc = app.managedObjectContext;
 
     NSArray *results = [moc executeFetchRequest:request error:&error];
 
