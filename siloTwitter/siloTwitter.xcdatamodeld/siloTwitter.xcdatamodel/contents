@@ -6,7 +6,7 @@
     </entity>
     <entity name="Tweet" representedClassName="Tweet">
         <attribute name="message" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="timeStamp" optional="YES" attributeType="Date">
+        <attribute name="timeStamp" attributeType="Date">
             <userInfo/>
         </attribute>
         <relationship name="hashtags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="HashTag" inverseName="tweet" inverseEntity="HashTag" syncable="YES"/>
@@ -15,12 +15,13 @@
     </entity>
     <entity name="User" representedClassName="User" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="password" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="username" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="tweets" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Tweet" inverseName="user" inverseEntity="Tweet" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Tweet" positionX="261" positionY="189" width="128" height="103"/>
-        <element name="User" positionX="279" positionY="225" width="128" height="28"/>
         <element name="HashTag" positionX="297" positionY="261" width="128" height="73"/>
+        <element name="Tweet" positionX="261" positionY="189" width="128" height="105"/>
+        <element name="User" positionX="279" positionY="225" width="128" height="103"/>
     </elements>
 </model>

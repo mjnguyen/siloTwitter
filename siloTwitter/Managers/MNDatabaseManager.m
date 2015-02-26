@@ -25,7 +25,7 @@
 - (void)deleteUser: (NSString *)username {
     // remove all data associated with username
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     User *userToDelete = [self findUserForUsername:username];
@@ -38,16 +38,16 @@
     }
 
 }
-- (void)createUser: (NSString *)username withName: (NSString *)fullName {
+- (void)createUser: (NSString *)username withName: (NSString *)fullName andPassword: (NSString *)password {
     NSError *error = nil;
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
     NSManagedObjectContext *moc = app.managedObjectContext;
-    [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     User *newUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([User class]) inManagedObjectContext:moc];
     [newUser setUsername:username];
     [newUser setName: fullName];
-
+    [newUser setPassword: password];
+    
     if (![moc save:&error]) {
         NSLog(@"Failed to create user!\nError: %@\nUser: %@", [error localizedDescription], newUser);
     }
@@ -87,7 +87,7 @@
 
     NSError *error = nil;
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     tweets = [moc executeFetchRequest:request error:&error];
@@ -109,18 +109,20 @@
 
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
     NSManagedObjectContext *moc = app.managedObjectContext;
-    [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     NSArray *results = [moc executeFetchRequest:request error:&error];
 
+    if (error != nil) {
+        NSLog(@"Error happened while getting user [%@]\nError: %@", username, [error localizedDescription]);
+        return nil;
+    }
     return [results firstObject];
 
 }
 
 -(void)saveTweet:(UserTweet *)userTweet {
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
-    [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
+    NSManagedObjectContext *moc = app.managedObjectContext; 
 
     User *user = [self findUserForUsername:userTweet.username];
     if (user == nil) {
@@ -128,9 +130,12 @@
         return;
     }
 
+    NSManagedObjectID *userContextId = [user objectID];
+    NSError *error = nil;
+
     // now that we have a valid user create the tweet and save it to the database
     Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([Tweet class]) inManagedObjectContext:moc];
-    tweet.user = user;
+    tweet.user = (User *)[moc existingObjectWithID:userContextId error:&error];
     tweet.message = userTweet.message;
 
     if ([userTweet.tags count] > 0) {
@@ -146,7 +151,6 @@
         [tweet setHashtags:tagsToAdd];
     }
 
-    NSError *error = nil;
     if (![moc save:&error]) {
         NSLog(@"Error while saving Tweet! %@", [error localizedDescription]);
         // Ideally, have a error handling system rather than just using straight notificiations.

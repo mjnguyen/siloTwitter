@@ -2,7 +2,7 @@
 //  User.h
 //  siloTwitter
 //
-//  Created by Michael Nguyen on 2/25/15.
+//  Created by Michael Nguyen on 2/26/15.
 //  Copyright (c) 2015 Michael Nguyen. All rights reserved.
 //
 
@@ -15,6 +15,7 @@
 
 @property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSString * username;
+@property (nonatomic, retain) NSString * password;
 @property (nonatomic, retain) NSSet *tweets;
 @end
 

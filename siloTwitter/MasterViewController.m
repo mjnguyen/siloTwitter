@@ -5,14 +5,18 @@
 //  Created by Michael Nguyen on 2/25/15.
 //  Copyright (c) 2015 Michael Nguyen. All rights reserved.
 //
-
-#import "Tweet.h"
-#import "UserTweet.h"
 #import "MasterViewController.h"
+#import "TSMessage.h"
+#import "MBProgressHUD.h"
+#import "MNTweetManager.h"
+#import "Tweet.h"
 #import "DetailViewController.h"
+#import "MNLoginViewController.h"
 
 @interface MasterViewController ()
 
+@property (nonatomic, copy) NSString *currentUsername;
+@property (nonatomic, strong) UIActivityIndicatorView *spinner;
 @end
 
 @implementation MasterViewController
@@ -30,9 +34,28 @@
     // Do any additional setup after loading the view, typically from a nib.
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
+    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showTweetInputDialog:)];
     self.navigationItem.rightBarButtonItem = addButton;
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+
+    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self.spinner.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+    [self.spinner setHidesWhenStopped:YES];
+
+    [self.tableView addSubview:self.spinner];
+    [self.tableView bringSubviewToFront: self.spinner];
+
+    
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    if (self.currentUsername == nil) {
+        // show login screen
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        MNLoginViewController *loginController = (MNLoginViewController *) [storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+        loginController.delegate = self;
+        [self.parentViewController presentViewController:loginController animated:YES completion:nil];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -40,23 +63,66 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)insertNewObject:(id)sender {
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-        
-    // If appropriate, configure the new managed object.
-    // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-    [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-        
-    // Save the context.
-    NSError *error = nil;
-    if (![context save:&error]) {
-        // Replace this implementation with code to handle the error appropriately.
-        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
+
+- (void)showTweetInputDialog:(id)sender {
+    UIAlertView *popup = [[UIAlertView alloc] initWithTitle:@"Tweet it!" message:@"Tell me your thoughts!" delegate:self cancelButtonTitle:@"Nevermind" otherButtonTitles:@"OK", nil];
+    [popup setAlertViewStyle:UIAlertViewStylePlainTextInput];
+    [popup show];
+}
+
+-(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    NSString *buttonTitle = [alertView buttonTitleAtIndex:buttonIndex];
+
+    if ( [buttonTitle isEqualToString:@"Nevermind"]) {
+    } else {
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.labelText = @"Posting Tweet...";
+        // create a new Tweet for this user
+        UserTweet *userTweet = [[UserTweet alloc] init];
+        userTweet.username = self.currentUsername;
+        userTweet.message = [[alertView textFieldAtIndex:0] text];
+        MNTweetManager *mgr = [MNTweetManager sharedManager];
+        [mgr tweetMessage:userTweet withCompletionBlock:^(id response, NSError *error) {
+            if (error == nil) {
+                [TSMessage showNotificationInViewController:self title:@"Tweet Posted!"  subtitle:@"Thanks!" type:TSMessageNotificationTypeSuccess duration:2.f canBeDismissedByUser:YES];
+            }
+            else {
+                NSString *errorMessage = [NSString stringWithFormat:@"Tweet Failed to Post!"];
+                [TSMessage showNotificationInViewController:self title:@"Tweet Unsuccessful!" subtitle:errorMessage type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+            }
+            [hud hide:YES];
+        }];
+
     }
+}
+
+#pragma mark - MNLoginViewController delegates
+
+-(void)loginViewControllerDidRegisterUserSuccessfully:(MNLoginViewController *)lvc {
+    self.currentUsername = lvc.registerUsernameField.text;
+    self.fetchedResultsController = nil;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
+    });
+
+    [TSMessage showNotificationInViewController:self title:@"Registration" subtitle:@"You have successfully been registered! Welcome!" type:TSMessageNotificationTypeSuccess duration:2.f canBeDismissedByUser:YES];
+}
+
+-(void)loginViewControllerDidReceivePasswordResetRequest:(MNLoginViewController *)lvc {
+    // do something here to handle password resets
+}
+
+-(void)loginViewController:(MNLoginViewController *)lvc didFailWithError:(NSError *)error {
+    // this is already handled in the login view controller. nothing to do here.
+}
+
+-(void)loginViewControllerDidLoginSuccessfully:(MNLoginViewController *)lvc {
+    self.currentUsername = lvc.usernameField.text;
+    self.fetchedResultsController = nil;
+
+    [self dismissViewControllerAnimated:YES completion:^{
+        [TSMessage showNotificationInViewController:self title:@"Login Successful" subtitle:@"Welcome Back!" type:TSMessageNotificationTypeMessage duration:1.f canBeDismissedByUser:YES];
+    }];
 }
 
 #pragma mark - Segues
@@ -110,15 +176,20 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    NSDate *tweetDate = [object valueForKey:@"timeStamp"];
+    Tweet *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    NSDate *tweetDate = object.timeStamp;
+
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-    [dateFormat setDateStyle:NSDateFormatterShortStyle];
+    [dateFormat setDateStyle:NSDateFormatterMediumStyle];
     [dateFormat setTimeStyle:NSDateFormatterMediumStyle];
     NSString *dateString = [dateFormat stringFromDate:tweetDate];
 
-    cell.detailTextLabel.text = dateString;
-    cell.textLabel.text = [[object valueForKey:@"message"] description];
+    NSString *message = object.message;
+    NSString *username = [object.user valueForKey:@"username"];
+    NSString *tweet = [NSString stringWithFormat:@"%@", message ];
+
+    cell.textLabel.text = tweet;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Posted by %@ - on %@", username, dateString];
 }
 
 #pragma mark - Fetched results controller
@@ -132,6 +203,9 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
     NSEntityDescription *entity = [NSEntityDescription entityForName:NSStringFromClass([Tweet class]) inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *userFilter = [NSPredicate predicateWithFormat:@"SELF.user.username == %@", self.currentUsername];
+    [fetchRequest setPredicate:userFilter];
+
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
@@ -145,7 +219,7 @@
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Master"];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     

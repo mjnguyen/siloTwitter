@@ -10,5 +10,13 @@
 
 @implementation UserTweet
 
+-(instancetype)init {
+    self = [super init];
+    if (self != nil) {
+        self.timestamp = [NSDate date];
+    }
+
+    return self;
+}
 
 @end
