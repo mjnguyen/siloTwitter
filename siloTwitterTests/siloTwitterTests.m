@@ -48,7 +48,7 @@ static NSString *testUserFullName = @"Michael Nguyen";
 
     if ([results count] == 0) {
     // create the User in the db
-        [dbMgr createUser:testUserName withName:testUserFullName];
+        [dbMgr createUser:testUserName withName:testUserFullName andPassword:@"password"];
     }
 
 }

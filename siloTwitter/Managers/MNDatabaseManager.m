@@ -38,7 +38,7 @@
     }
 
 }
-- (void)createUser: (NSString *)username withName: (NSString *)fullName {
+- (void)createUser: (NSString *)username withName: (NSString *)fullName andPassword: (NSString *)password {
     NSError *error = nil;
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
     NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
@@ -47,7 +47,8 @@
     User *newUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([User class]) inManagedObjectContext:moc];
     [newUser setUsername:username];
     [newUser setName: fullName];
-
+    [newUser setPassword: password];
+    
     if (![moc save:&error]) {
         NSLog(@"Failed to create user!\nError: %@\nUser: %@", [error localizedDescription], newUser);
     }

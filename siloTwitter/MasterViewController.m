@@ -10,8 +10,9 @@
 #import "Tweet.h"
 #import "MasterViewController.h"
 #import "DetailViewController.h"
+#import "MNLoginViewController.h"
 
-@interface MasterViewController () <UIAlertViewDelegate>
+@interface MasterViewController () <UIAlertViewDelegate, MNLoginViewControllerDelegate>
 
 @property (nonatomic, copy) NSString *currentUsername;
 @end
@@ -36,10 +37,21 @@
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
+-(void)viewWillAppear:(BOOL)animated {
+    if (self.currentUsername == nil) {
+        // show login screen
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        MNLoginViewController *loginController = (MNLoginViewController *) [storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+        loginController.delegate = self;
+        [self.parentViewController presentViewController:loginController animated:YES completion:nil];
+    }
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 - (void)showTweetInputDialog:(id)sender {
     UIAlertView *popup = [[UIAlertView alloc] initWithTitle:@"Tweet it!" message:@"Tell me your thoughts!" delegate:self cancelButtonTitle:@"Nevermind" otherButtonTitles:@"OK", nil];
@@ -71,6 +83,33 @@
         }];
 
     }
+}
+
+#pragma mark - MNLoginViewController delegates
+
+-(void)loginViewControllerDidRegisterUserSuccessfully:(MNLoginViewController *)lvc {
+    self.currentUsername = lvc.registerUsernameField.text;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
+    });
+
+}
+
+-(void)loginViewControllerDidReceivePasswordResetRequest:(MNLoginViewController *)lvc {
+    // do something here to handle password resets
+}
+
+-(void)loginViewController:(MNLoginViewController *)lvc didFailWithError:(NSError *)error {
+
+}
+
+-(void)loginViewControllerDidLoginSuccessfully:(MNLoginViewController *)lvc {
+    self.currentUsername = lvc.usernameField.text;
+
+    [self dismissViewControllerAnimated:YES completion:^{
+        [TSMessage showNotificationInViewController:self title:@"Login Successful" subtitle:@"Welcome" type:TSMessageNotificationTypeMessage duration:1.f canBeDismissedByUser:YES];
+    }];
 }
 
 - (void)insertNewObject:(id)sender {
