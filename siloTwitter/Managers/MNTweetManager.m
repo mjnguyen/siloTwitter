@@ -25,20 +25,25 @@
 - (void)tweetMessage:(UserTweet *)userTweet withCompletionBlock: (MNTweetResponseBlock)callback {
     MNDatabaseManager *dbManager = [MNDatabaseManager sharedManager];
     // verify user exists
+    NSError *error = nil;
     User *user = [dbManager findUserForUsername:userTweet.username];
     if (user == nil) {
         // invalid tweet was sent as User doesn't exist.
         // send a notification of such
-        return;
+        NSDictionary *userInfo = @{NSLocalizedFailureReasonErrorKey: @"Unknown User"};
+
+        error = [[NSError alloc] initWithDomain:@"Uknown User" code:2000 userInfo:userInfo];
     }
     // introduce a delay in the processing
     double delayInSeconds = 2.0;
     dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
     dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        if (error == nil) {
+            // now we can send the tweet
+            [dbManager saveTweet:userTweet];
+        }
 
-        // now we can send the tweet
-        [dbManager saveTweet:userTweet];
-        callback(userTweet, nil);
+        callback(userTweet, error);
     });
 }
 
