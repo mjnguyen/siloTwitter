@@ -11,6 +11,7 @@
 #import "AppDelegate.h"
 #import "MNDatabaseManager.h"
 #import "UserTweet.h"
+#import "MNUser.h"
 #import "MNTweetManager.h"
 
 @interface siloTwitterTests : XCTestCase {
@@ -22,7 +23,13 @@
 @implementation siloTwitterTests
 
 static NSString *testUserName = @"MichaelNguyen";
+static NSString *testUserPassword = @"MichaelNguyen";
 static NSString *testUserFullName = @"Michael Nguyen";
+
+static NSString *testRegisterUserName = @"MichaelNguyen2";
+static NSString *testRegisterUserPassword = @"MichaelNguyen2";
+static NSString *testRegisterUserFullName = @"Michael Nguyen2";
+
 // ensure our test user exists, if not create him
 - (void)initializeDb {
 
@@ -48,7 +55,7 @@ static NSString *testUserFullName = @"Michael Nguyen";
 
     if ([results count] == 0) {
     // create the User in the db
-        [dbMgr createUser:testUserName withName:testUserFullName andPassword:@"password"];
+        [dbMgr createUser:testUserName withName:testUserFullName andPassword:testUserPassword];
     }
 
 }
@@ -56,7 +63,7 @@ static NSString *testUserFullName = @"Michael Nguyen";
 - (void)deleteTestUser {
 
     NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([User class])];
-    NSPredicate *filter = [NSPredicate predicateWithFormat:@"SELF.username = %@",testUserName];
+    NSPredicate *filter = [NSPredicate predicateWithFormat:@"SELF.username = %@ OR SELF.username = %@",testUserName, testRegisterUserName];
     [request setPredicate:filter];
 
     AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -117,6 +124,29 @@ static NSString *testUserFullName = @"Michael Nguyen";
         }
     }];
     
+}
+
+- (void)testLogin {
+    MNUser *user = [[MNUser alloc] init];
+    user.password = testUserPassword;
+    user.username = testUserName;
+    user.fullname = testUserFullName;
+
+    [tweetMgr loginUser:user withCompletionBlock:^(id response, NSError *error) {
+        XCTAssertNil(error);
+
+    }];
+}
+
+- (void)testRegisterUser {
+    MNUser *user = [[MNUser alloc] init];
+    user.password = testRegisterUserPassword;
+    user.username = testRegisterUserName;
+    user.fullname = testRegisterUserFullName;
+
+    [tweetMgr registerUser:user withCompletionBlock:^(id response, NSError *error) {
+        XCTAssertNil(error);
+    }];
 }
 
 - (void)testPerformanceExample {
