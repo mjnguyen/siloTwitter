@@ -1,0 +1,42 @@
+PODS:
+  - AFNetworking (2.5.1):
+    - AFNetworking/NSURLConnection (= 2.5.1)
+    - AFNetworking/NSURLSession (= 2.5.1)
+    - AFNetworking/Reachability (= 2.5.1)
+    - AFNetworking/Security (= 2.5.1)
+    - AFNetworking/Serialization (= 2.5.1)
+    - AFNetworking/UIKit (= 2.5.1)
+  - AFNetworking/NSURLConnection (2.5.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/NSURLSession (2.5.1):
+    - AFNetworking/Reachability
+    - AFNetworking/Security
+    - AFNetworking/Serialization
+  - AFNetworking/Reachability (2.5.1)
+  - AFNetworking/Security (2.5.1)
+  - AFNetworking/Serialization (2.5.1)
+  - AFNetworking/UIKit (2.5.1):
+    - AFNetworking/NSURLConnection
+    - AFNetworking/NSURLSession
+  - HexColors (2.2.1)
+  - iCarousel (1.8.1)
+  - TSMessages (0.9.12):
+    - HexColors
+  - ZSSRichTextEditor (0.5.2.1)
+
+DEPENDENCIES:
+  - AFNetworking (~> 2.5)
+  - iCarousel (~> 1.8.1)
+  - TSMessages
+  - ZSSRichTextEditor
+
+SPEC CHECKSUMS:
+  AFNetworking: 8bee59492a6ff15d69130efa4d0dc67e0094a52a
+  HexColors: 01384d2bbe8dc4ffa43c3b4135db6e976952d153
+  iCarousel: 5acab560f10dc13da2440c89f35a0ad278b5147d
+  TSMessages: b2b5dc71f65146387e51f2600bb0eb8f3a6c4ab8
+  ZSSRichTextEditor: 742425fd433c973ab9145922629487d5623d68c3
+
+COCOAPODS: 0.35.0
