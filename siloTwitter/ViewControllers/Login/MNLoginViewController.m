@@ -17,6 +17,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    self.usernameField.leftView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon-user-gray"]];
+    self.usernameField.leftViewMode = UITextFieldViewModeAlways;
+
+    self.passwordField.leftView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"icon-password-gray"]];
+    self.passwordField.leftViewMode = UITextFieldViewModeAlways;
+
 }
 
 - (void)didReceiveMemoryWarning {

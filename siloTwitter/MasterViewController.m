@@ -36,6 +36,15 @@
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
 
+-(void)viewWillAppear:(BOOL)animated {
+    if (self.currentUsername == nil) {
+        // show login screen
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        UIViewController *loginController = [storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+        [self.parentViewController presentViewController:loginController animated:YES completion:nil];
+    }
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
