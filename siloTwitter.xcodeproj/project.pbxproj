@@ -31,6 +31,8 @@
 		124A5C291A9F19F600E588F2 /* icon-user-gray@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 124A5C251A9F19F600E588F2 /* icon-user-gray@3x.png */; };
 		124A5C2C1A9F26D900E588F2 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 124A5C2B1A9F26D900E588F2 /* User.m */; };
 		12DBA6D11A9FB11F009C822E /* MNUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 12DBA6D01A9FB11F009C822E /* MNUser.m */; };
+		12DBA6D41A9FBC74009C822E /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = 12DBA6D21A9FBC74009C822E /* LICENSE */; };
+		12DBA6D51A9FBC74009C822E /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 12DBA6D31A9FBC74009C822E /* README.md */; };
 		36E8DC03B97B24E284E78331 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A8587B62DE4DF186CDD4F9B9 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -84,6 +86,8 @@
 		124A5C2B1A9F26D900E588F2 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = User.m; path = Models/User.m; sourceTree = "<group>"; };
 		12DBA6CF1A9FB11F009C822E /* MNUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MNUser.h; path = Models/MNUser.h; sourceTree = "<group>"; };
 		12DBA6D01A9FB11F009C822E /* MNUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MNUser.m; path = Models/MNUser.m; sourceTree = "<group>"; };
+		12DBA6D21A9FBC74009C822E /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		12DBA6D31A9FBC74009C822E /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3EB7A583FBECDB7B3F696194 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		A8587B62DE4DF186CDD4F9B9 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D72E338F5A7124EB7D2FB02D /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -232,6 +236,8 @@
 		124A5C191A9F118600E588F2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				12DBA6D21A9FBC74009C822E /* LICENSE */,
+				12DBA6D31A9FBC74009C822E /* README.md */,
 				124A5C1A1A9F118600E588F2 /* Icons */,
 				124A5C1E1A9F118600E588F2 /* Images */,
 			);
@@ -363,6 +369,7 @@
 				124A5C261A9F19F600E588F2 /* icon-password-gray@2x.png in Resources */,
 				124A5BEA1A9EA6F200E588F2 /* LaunchScreen.xib in Resources */,
 				124A5C1F1A9F118600E588F2 /* icon-password-gray.png in Resources */,
+				12DBA6D41A9FBC74009C822E /* LICENSE in Resources */,
 				124A5BE71A9EA6F200E588F2 /* Images.xcassets in Resources */,
 				124A5C281A9F19F600E588F2 /* icon-user-gray@2x.png in Resources */,
 				124A5C211A9F118600E588F2 /* icon-user-gray.png in Resources */,
@@ -428,6 +435,7 @@
 				124A5C0B1A9EAA8A00E588F2 /* MNLoginViewController.m in Sources */,
 				124A5C0F1A9EBF7C00E588F2 /* HashTag.m in Sources */,
 				124A5C2C1A9F26D900E588F2 /* User.m in Sources */,
+				12DBA6D51A9FBC74009C822E /* README.md in Sources */,
 				124A5C121A9EBF7C00E588F2 /* Tweet.m in Sources */,
 				124A5BD91A9EA6F200E588F2 /* AppDelegate.m in Sources */,
 				124A5BD61A9EA6F200E588F2 /* main.m in Sources */,
