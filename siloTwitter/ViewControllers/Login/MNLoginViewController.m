@@ -13,6 +13,12 @@
 #import "MBProgressHUD.h"
 #import "MNUser.h"
 
+@interface MNLoginViewController ()
+
+@property (nonatomic, strong) UITextField *activeField;
+@property (nonatomic, strong) IBOutlet UIScrollView *scrollView;
+@end
+
 @implementation MNLoginViewController
 
 - (void)viewDidLoad {
@@ -29,7 +35,7 @@
                                    action:@selector(dismissKeyboard:)];
 
     [self.view addGestureRecognizer: tap];
-    [self.spinner stopAnimating];
+    [self registerForKeyboardNotifications];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -115,10 +121,10 @@
             }
 
         }];
-
-
-
 }
+
+
+#pragma mark - MNLoginViewController Delegate
 
 -(void)loginViewController:(MNLoginViewController *)lvc didFailWithError:(NSError *)error {
     if ([self.delegate respondsToSelector:@selector(loginViewController:didFailWithError:)]) {
@@ -138,14 +144,45 @@
     }
 }
 
-/*
-#pragma mark - Navigation
+#pragma mark - Keyboard delegate
+- (void)registerForKeyboardNotifications
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWasShown:)
+                                                 name:UIKeyboardDidShowNotification object:nil];
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillBeHidden:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+    
 }
-*/
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    self.activeField = textField;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+    self.activeField = nil;
+}
+
+- (void)keyboardWasShown:(NSNotification*)aNotification {
+    NSDictionary* info = [aNotification userInfo];
+    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
+    CGRect bkgndRect = self.activeField.superview.frame;
+    bkgndRect.size.height += kbSize.height;
+    [self.activeField.superview setFrame:bkgndRect];
+    [self.scrollView setContentOffset:CGPointMake(0.0, self.activeField.frame.origin.y-kbSize.height) animated:YES];
+}
+
+// Called when the UIKeyboardWillHideNotification is sent
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification
+{
+    UIEdgeInsets contentInsets = UIEdgeInsetsZero;
+    self.scrollView.contentInset = contentInsets;
+    self.scrollView.scrollIndicatorInsets = contentInsets;
+    [self.scrollView setContentOffset:CGPointMake(0.0, 0.0) animated:YES];
+}
 
 @end

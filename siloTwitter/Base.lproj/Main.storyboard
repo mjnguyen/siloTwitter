@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <scenes>
@@ -85,11 +84,17 @@
                                 <rect key="frame" x="289" y="125" width="120" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="twitter"/>
+                                <connections>
+                                    <outlet property="delegate" destination="RfS-7L-wYh" id="fDM-B7-7VP"/>
+                                </connections>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="06u-Wi-XFO">
                                 <rect key="frame" x="289" y="168" width="120" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                <connections>
+                                    <outlet property="delegate" destination="RfS-7L-wYh" id="uw3-zH-NzW"/>
+                                </connections>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="D9g-dn-Mu5">
                                 <rect key="frame" x="192" y="206" width="222" height="30"/>
@@ -123,6 +128,9 @@
                                 <rect key="frame" x="289" y="292" width="120" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" keyboardType="twitter"/>
+                                <connections>
+                                    <outlet property="delegate" destination="RfS-7L-wYh" id="9fM-K4-gqk"/>
+                                </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ote-8i-6NN">
                                 <rect key="frame" x="191" y="258" width="46" height="21"/>
@@ -137,11 +145,17 @@
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="words"/>
+                                <connections>
+                                    <outlet property="delegate" destination="RfS-7L-wYh" id="sMU-ps-L6V"/>
+                                </connections>
                             </textField>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Hfl-h4-OaA">
                                 <rect key="frame" x="289" y="337" width="120" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                <connections>
+                                    <outlet property="delegate" destination="RfS-7L-wYh" id="dtv-tI-LBe"/>
+                                </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tFr-sf-zhg">
                                 <rect key="frame" x="192" y="379" width="76" height="21"/>
@@ -153,6 +167,9 @@
                                 <rect key="frame" x="289" y="375" width="120" height="30"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" secureTextEntry="YES"/>
+                                <connections>
+                                    <outlet property="delegate" destination="RfS-7L-wYh" id="miT-OB-1TQ"/>
+                                </connections>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9OE-hK-2gu">
                                 <rect key="frame" x="192" y="418" width="217" height="30"/>
@@ -236,6 +253,7 @@
                         <outlet property="registerPassword2Label" destination="tFr-sf-zhg" id="UO3-Aq-gxA"/>
                         <outlet property="registerUsernameField" destination="Jr4-dM-A7J" id="jYh-jc-fx9"/>
                         <outlet property="registerUsernameLabel" destination="Ra0-X8-wbY" id="XR6-CJ-hFy"/>
+                        <outlet property="scrollView" destination="TXk-F4-bNb" id="653-Qu-LbK"/>
                         <outlet property="spinner" destination="ezF-j3-qvd" id="kN3-Pk-PvW"/>
                         <outlet property="titleLabel" destination="QsF-wN-BaK" id="EDH-EW-yCS"/>
                         <outlet property="usernameField" destination="d5R-oS-ROh" id="ZcX-Tl-Z3L"/>
