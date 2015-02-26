@@ -9,6 +9,7 @@
 #import "MNLoginViewController.h"
 #import "MNDatabaseManager.h"
 #import "TSMessage.h"
+#import "MBProgressHUD.h"
 
 @implementation MNLoginViewController
 
@@ -54,11 +55,12 @@
     }
     else {
 
-        [self.spinner startAnimating];
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.labelText = @"Registering Account . . .";
 
         __weak MNLoginViewController *weakSelf = self;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [weakSelf.spinner stopAnimating];
+            [hud hide:YES];
             if ([dbMgr findUserForUsername:self.registerUsernameField.text]) {
                 // user exists, display error message and refocus to username field
                 [weakSelf.registerUsernameField becomeFirstResponder];
@@ -71,6 +73,7 @@
                 [dbMgr createUser:weakSelf.registerUsernameField.text withName:weakSelf.registerFullNameField.text andPassword:weakSelf.registerPassword1Field.text];
                 [weakSelf.delegate loginViewControllerDidRegisterUserSuccessfully:weakSelf];
             }
+
         });
     }
 }
@@ -80,8 +83,11 @@
     MNDatabaseManager *dbMgr = [MNDatabaseManager sharedManager];
     User *user = [dbMgr findUserForUsername:self.usernameField.text];
     __weak MNLoginViewController *weakSelf = self;
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText = @"Logging you in . . .";
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [hud hide:YES];
         if (user != nil) {
             [weakSelf loginViewControllerDidLoginSuccessfully:weakSelf];
         }

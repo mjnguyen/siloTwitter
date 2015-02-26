@@ -7,6 +7,7 @@
 //
 #import "MasterViewController.h"
 #import "TSMessage.h"
+#import "MBProgressHUD.h"
 #import "MNTweetManager.h"
 #import "Tweet.h"
 #import "DetailViewController.h"
@@ -71,18 +72,16 @@
 
 -(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     NSString *buttonTitle = [alertView buttonTitleAtIndex:buttonIndex];
-    [self.spinner startAnimating];
+
     if ( [buttonTitle isEqualToString:@"Nevermind"]) {
-        [self.spinner stopAnimating];
     } else {
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.labelText = @"Posting Tweet...";
         // create a new Tweet for this user
         UserTweet *userTweet = [[UserTweet alloc] init];
         userTweet.username = self.currentUsername;
         userTweet.message = [[alertView textFieldAtIndex:0] text];
         MNTweetManager *mgr = [MNTweetManager sharedManager];
-
-        __weak MasterViewController *weakSelf = self;
-
         [mgr tweetMessage:userTweet withCompletionBlock:^(id response, NSError *error) {
             if (error == nil) {
                 [TSMessage showNotificationInViewController:self title:@"Tweet Posted!"  subtitle:@"Thanks!" type:TSMessageNotificationTypeSuccess duration:2.f canBeDismissedByUser:YES];
@@ -91,7 +90,7 @@
                 NSString *errorMessage = [NSString stringWithFormat:@"Tweet Failed to Post!"];
                 [TSMessage showNotificationInViewController:self title:@"Tweet Unsuccessful!" subtitle:errorMessage type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
             }
-            [weakSelf.spinner stopAnimating];
+            [hud hide:YES];
         }];
 
     }
@@ -106,6 +105,7 @@
         [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
     });
 
+    [TSMessage showNotificationInViewController:self title:@"Registration" subtitle:@"You have successfully been registered! Welcome!" type:TSMessageNotificationTypeSuccess duration:2.f canBeDismissedByUser:YES];
 }
 
 -(void)loginViewControllerDidReceivePasswordResetRequest:(MNLoginViewController *)lvc {
@@ -113,7 +113,7 @@
 }
 
 -(void)loginViewController:(MNLoginViewController *)lvc didFailWithError:(NSError *)error {
-
+    // this is already handled in the login view controller. nothing to do here.
 }
 
 -(void)loginViewControllerDidLoginSuccessfully:(MNLoginViewController *)lvc {
@@ -121,7 +121,7 @@
     self.fetchedResultsController = nil;
 
     [self dismissViewControllerAnimated:YES completion:^{
-        [TSMessage showNotificationInViewController:self title:@"Login Successful" subtitle:@"Welcome" type:TSMessageNotificationTypeMessage duration:1.f canBeDismissedByUser:YES];
+        [TSMessage showNotificationInViewController:self title:@"Login Successful" subtitle:@"Welcome Back!" type:TSMessageNotificationTypeMessage duration:1.f canBeDismissedByUser:YES];
     }];
 }
 
