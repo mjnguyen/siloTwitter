@@ -67,23 +67,20 @@
         newUser.password = self.registerPassword1Field.text;
 
         __weak MNLoginViewController *weakSelf = self;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [tweetMgr registerUser:newUser withCompletionBlock:^(id response, NSError *error) {
             [hud hide:YES];
-            if ([dbMgr findUserForUsername:self.registerUsernameField.text]) {
-                // user exists, display error message and refocus to username field
-                [weakSelf.registerUsernameField becomeFirstResponder];
-
-                [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"Username already exists. Please try another one." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
-            }
-
-            else {
-                // basic check is good.  Now register the user and dismiss the screen
+            if (error == nil) {
                 [tweetMgr registerUser:newUser withCompletionBlock:^(id response, NSError *error) {
                     [weakSelf.delegate loginViewControllerDidRegisterUserSuccessfully:weakSelf];
                 }];
-            }
+            } else {
+                [weakSelf.registerUsernameField becomeFirstResponder];
 
-        });
+                [TSMessage showNotificationInViewController:self title:@"Registration Error" subtitle:[error localizedDescription] type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+
+            }
+        }];
+
     }
 }
 
@@ -105,7 +102,7 @@
     user.username = self.usernameField.text;
     user.password = self.passwordField.text;
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+
         [mgr loginUser:user withCompletionBlock:^(id user, NSError *error) {
             [hud hide:YES];
             if (error == nil) {
@@ -119,7 +116,7 @@
 
         }];
 
-    });
+
 
 }
 
