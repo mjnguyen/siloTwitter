@@ -97,7 +97,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="loginUser:" destination="RfS-7L-wYh" eventType="touchDragInside" id="0Yl-6Y-CSU"/>
+                                    <action selector="loginUser:" destination="RfS-7L-wYh" eventType="touchUpInside" id="TZi-MN-bje"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome to My Fake Twitter" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QsF-wN-BaK">

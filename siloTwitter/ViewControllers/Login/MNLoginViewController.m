@@ -52,11 +52,12 @@
     if (![self.registerPassword1Field.text isEqualToString: self.registerPassword2Field.text]) {
         [TSMessage showNotificationWithTitle:@"Passwords do not match." type:TSMessageNotificationTypeError];
     }
-    else if ([self.registerFullNameField.text length] < 5) {
-        [TSMessage showNotificationWithTitle:@"Full name must not be empty." type:TSMessageNotificationTypeError];
+    else if ([self.registerFullNameField.text length] < 1) {
+        [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"Full name must not be empty." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
     }
     else if ([self.registerUsernameField.text length] < 5) {
-        [TSMessage showNotificationWithTitle:@"Username must be at least 5 characters." type:TSMessageNotificationTypeError];
+        [TSMessage showNotificationInViewController:self title:@"Error" subtitle:@"username must be at least 5 letters." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+
     } else {
         // basic check is good.  Now register the user and dismiss the screen
         __weak MNLoginViewController *weakSelf = self;
@@ -71,14 +72,18 @@
 - (IBAction)loginUser:(id)sender {
     // first find if user already exists
     MNDatabaseManager *dbMgr = [MNDatabaseManager sharedManager];
-    User *user = [dbMgr findUserForUsername:self.registerUsernameField.text];
-    if (user != nil) {
-        [self loginViewControllerDidLoginSuccessfully:self];
-    }
-    else {
-        // login failed.
-        [TSMessage showNotificationInViewController:self title:@"Login Failed" subtitle:@"Username/password do not match." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
-    }
+    User *user = [dbMgr findUserForUsername:self.usernameField.text];
+    __weak MNLoginViewController *weakSelf = self;
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (user != nil) {
+            [weakSelf loginViewControllerDidLoginSuccessfully:weakSelf];
+        }
+        else {
+            // login failed.
+            [TSMessage showNotificationInViewController:self title:@"Login Failed" subtitle:@"Username/password do not match." type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
+        }
+    });
 
 }
 

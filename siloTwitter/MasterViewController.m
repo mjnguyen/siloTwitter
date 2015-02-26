@@ -107,7 +107,9 @@
 -(void)loginViewControllerDidLoginSuccessfully:(MNLoginViewController *)lvc {
     self.currentUsername = lvc.usernameField.text;
 
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^{
+        [TSMessage showNotificationInViewController:self title:@"Login Successful" subtitle:@"Welcome" type:TSMessageNotificationTypeMessage duration:1.f canBeDismissedByUser:YES];
+    }];
 }
 
 - (void)insertNewObject:(id)sender {
