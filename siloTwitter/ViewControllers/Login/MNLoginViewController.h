@@ -29,6 +29,7 @@
 
 @interface MNLoginViewController : UIViewController <MNLoginViewControllerDelegate>
 
+@property (nonatomic, weak) IBOutlet UIActivityIndicatorView *spinner;
 
 @property (nonatomic, weak) id<MNLoginViewControllerDelegate> delegate;
 

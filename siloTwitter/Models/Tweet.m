@@ -7,6 +7,7 @@
 //
 
 #import "Tweet.h"
+#import "User.h"
 #import "HashTag.h"
 
 
@@ -17,4 +18,23 @@
 @dynamic user;
 @dynamic hashtags;
 
+
+- (void)awakeFromInsert
+{
+    [super awakeFromInsert];
+    self.timeStamp = [NSDate date];
+}
+
+-(NSString *)description {
+    NSDate *tweetDate = self.timeStamp;
+
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateStyle:NSDateFormatterMediumStyle];
+    [dateFormat setTimeStyle:NSDateFormatterMediumStyle];
+    NSString *dateString = [dateFormat stringFromDate:tweetDate];
+
+    User *user= (User *) self.user;
+
+    return [NSString stringWithFormat:@"%@ - Posted by %@, %@", self.message, [user username], dateString];
+}
 @end

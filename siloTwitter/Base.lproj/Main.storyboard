@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="H1p-Uh-vWS">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <scenes>
@@ -164,6 +165,10 @@
                                     <action selector="registerUser:" destination="RfS-7L-wYh" eventType="touchUpInside" id="uAn-YV-Qvd"/>
                                 </connections>
                             </button>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="ezF-j3-qvd">
+                                <rect key="frame" x="282" y="281" width="37" height="37"/>
+                                <color key="color" red="0.96862745100000003" green="0.76470588240000004" blue="0.090196078430000007" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -187,6 +192,7 @@
                             <constraint firstItem="Ote-8i-6NN" firstAttribute="top" secondItem="D9g-dn-Mu5" secondAttribute="bottom" constant="22" id="NHG-7p-ezy"/>
                             <constraint firstItem="hNt-CJ-GBq" firstAttribute="centerX" secondItem="Ra0-X8-wbY" secondAttribute="centerX" constant="-0.5" id="QKd-p7-mfs"/>
                             <constraint firstItem="06u-Wi-XFO" firstAttribute="centerX" secondItem="9OE-hK-2gu" secondAttribute="centerX" id="S8R-1J-Yhl"/>
+                            <constraint firstAttribute="centerY" secondItem="ezF-j3-qvd" secondAttribute="centerY" constant="0.5" id="Up3-qE-GpL"/>
                             <constraint firstItem="06u-Wi-XFO" firstAttribute="trailing" secondItem="QsF-wN-BaK" secondAttribute="trailing" id="VCX-Vt-N8b"/>
                             <constraint firstAttribute="centerX" secondItem="D9g-dn-Mu5" secondAttribute="centerX" constant="-3" id="WAa-NY-VIA"/>
                             <constraint firstItem="D9g-dn-Mu5" firstAttribute="trailing" secondItem="06u-Wi-XFO" secondAttribute="trailing" constant="5" id="XNj-3s-iO0"/>
@@ -194,6 +200,7 @@
                             <constraint firstAttribute="centerX" secondItem="QsF-wN-BaK" secondAttribute="centerX" constant="-0.5" id="dRJ-vg-aRb"/>
                             <constraint firstItem="D9g-dn-Mu5" firstAttribute="top" secondItem="BRZ-gQ-o43" secondAttribute="bottom" constant="13" id="ebD-r7-2dF"/>
                             <constraint firstItem="36R-bF-PiQ" firstAttribute="top" secondItem="Hfl-h4-OaA" secondAttribute="bottom" constant="8" id="fTn-pf-V0A"/>
+                            <constraint firstAttribute="centerX" secondItem="ezF-j3-qvd" secondAttribute="centerX" constant="-0.5" id="g4Z-8o-m9I"/>
                             <constraint firstItem="Rcb-Zn-eOP" firstAttribute="leading" secondItem="QsF-wN-BaK" secondAttribute="leading" id="gut-rC-egB"/>
                             <constraint firstItem="D9g-dn-Mu5" firstAttribute="centerX" secondItem="BRZ-gQ-o43" secondAttribute="centerX" constant="73" id="jYd-i7-rNJ"/>
                             <constraint firstItem="Eid-IY-Bt9" firstAttribute="top" secondItem="D9g-dn-Mu5" secondAttribute="bottom" constant="18" id="m36-No-cMG"/>
@@ -229,6 +236,7 @@
                         <outlet property="registerPassword2Label" destination="tFr-sf-zhg" id="UO3-Aq-gxA"/>
                         <outlet property="registerUsernameField" destination="Jr4-dM-A7J" id="jYh-jc-fx9"/>
                         <outlet property="registerUsernameLabel" destination="Ra0-X8-wbY" id="XR6-CJ-hFy"/>
+                        <outlet property="spinner" destination="ezF-j3-qvd" id="kN3-Pk-PvW"/>
                         <outlet property="titleLabel" destination="QsF-wN-BaK" id="EDH-EW-yCS"/>
                         <outlet property="usernameField" destination="d5R-oS-ROh" id="ZcX-Tl-Z3L"/>
                         <outlet property="usernameLabel" destination="Rcb-Zn-eOP" id="RjV-Hg-9t9"/>
@@ -236,7 +244,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9XL-b3-sSS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-844" y="-1436"/>
+            <point key="canvasLocation" x="-844" y="-1100"/>
         </scene>
         <!--Split View Controller-->
         <scene sceneID="Nki-YV-4Qg">
@@ -252,10 +260,10 @@
             </objects>
             <point key="canvasLocation" x="-856" y="-330"/>
         </scene>
-        <!--Master-->
+        <!--Fake Twitter-->
         <scene sceneID="smW-Zh-WAh">
             <objects>
-                <tableViewController title="Master" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" sceneMemberID="viewController">
+                <tableViewController title="Fake Twitter" clearsSelectionOnViewWillAppear="NO" id="7bK-jq-Zjz" customClass="MasterViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="r7i-6Z-zg0">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -295,7 +303,7 @@
                             <outlet property="delegate" destination="7bK-jq-Zjz" id="RA6-mI-bju"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Master" id="Zdf-7t-Un8"/>
+                    <navigationItem key="navigationItem" title="Fake Twitter" id="Zdf-7t-Un8"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Rux-fX-hf1" sceneMemberID="firstResponder"/>
             </objects>

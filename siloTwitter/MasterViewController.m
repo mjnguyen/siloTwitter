@@ -5,16 +5,17 @@
 //  Created by Michael Nguyen on 2/25/15.
 //  Copyright (c) 2015 Michael Nguyen. All rights reserved.
 //
+#import "MasterViewController.h"
 #import "TSMessage.h"
 #import "MNTweetManager.h"
 #import "Tweet.h"
-#import "MasterViewController.h"
 #import "DetailViewController.h"
 #import "MNLoginViewController.h"
 
-@interface MasterViewController () <UIAlertViewDelegate, MNLoginViewControllerDelegate>
+@interface MasterViewController ()
 
 @property (nonatomic, copy) NSString *currentUsername;
+@property (nonatomic, strong) UIActivityIndicatorView *spinner;
 @end
 
 @implementation MasterViewController
@@ -35,6 +36,15 @@
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showTweetInputDialog:)];
     self.navigationItem.rightBarButtonItem = addButton;
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+
+    self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self.spinner.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+    [self.spinner setHidesWhenStopped:YES];
+
+    [self.tableView addSubview:self.spinner];
+    [self.tableView bringSubviewToFront: self.spinner];
+
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -56,30 +66,32 @@
 - (void)showTweetInputDialog:(id)sender {
     UIAlertView *popup = [[UIAlertView alloc] initWithTitle:@"Tweet it!" message:@"Tell me your thoughts!" delegate:self cancelButtonTitle:@"Nevermind" otherButtonTitles:@"OK", nil];
     [popup setAlertViewStyle:UIAlertViewStylePlainTextInput];
-
-    [popup show];   
-
+    [popup show];
 }
 
 -(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     NSString *buttonTitle = [alertView buttonTitleAtIndex:buttonIndex];
+    [self.spinner startAnimating];
     if ( [buttonTitle isEqualToString:@"Nevermind"]) {
-
+        [self.spinner stopAnimating];
     } else {
         // create a new Tweet for this user
         UserTweet *userTweet = [[UserTweet alloc] init];
         userTweet.username = self.currentUsername;
         userTweet.message = [[alertView textFieldAtIndex:0] text];
         MNTweetManager *mgr = [MNTweetManager sharedManager];
+
+        __weak MasterViewController *weakSelf = self;
+
         [mgr tweetMessage:userTweet withCompletionBlock:^(id response, NSError *error) {
             if (error == nil) {
-                [TSMessage showNotificationWithTitle:@"Tweet Posted!" subtitle:@"Thanks!" type:TSMessageNotificationTypeSuccess];
+                [TSMessage showNotificationInViewController:self title:@"Tweet Posted!"  subtitle:@"Thanks!" type:TSMessageNotificationTypeSuccess duration:2.f canBeDismissedByUser:YES];
             }
             else {
                 NSString *errorMessage = [NSString stringWithFormat:@"Tweet Failed to Post!"];
-                [TSMessage showNotificationWithTitle:@"Tweet Failed to Post!" subtitle:errorMessage type:TSMessageNotificationTypeError];
+                [TSMessage showNotificationInViewController:self title:@"Tweet Unsuccessful!" subtitle:errorMessage type:TSMessageNotificationTypeError duration:2.f canBeDismissedByUser:YES];
             }
-
+            [weakSelf.spinner stopAnimating];
         }];
 
     }
@@ -89,7 +101,7 @@
 
 -(void)loginViewControllerDidRegisterUserSuccessfully:(MNLoginViewController *)lvc {
     self.currentUsername = lvc.registerUsernameField.text;
-
+    self.fetchedResultsController = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
     });
@@ -106,29 +118,11 @@
 
 -(void)loginViewControllerDidLoginSuccessfully:(MNLoginViewController *)lvc {
     self.currentUsername = lvc.usernameField.text;
+    self.fetchedResultsController = nil;
 
     [self dismissViewControllerAnimated:YES completion:^{
         [TSMessage showNotificationInViewController:self title:@"Login Successful" subtitle:@"Welcome" type:TSMessageNotificationTypeMessage duration:1.f canBeDismissedByUser:YES];
     }];
-}
-
-- (void)insertNewObject:(id)sender {
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-        
-    // If appropriate, configure the new managed object.
-    // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-    [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-        
-    // Save the context.
-    NSError *error = nil;
-    if (![context save:&error]) {
-        // Replace this implementation with code to handle the error appropriately.
-        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
-    }
 }
 
 #pragma mark - Segues
@@ -209,6 +203,9 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
     NSEntityDescription *entity = [NSEntityDescription entityForName:NSStringFromClass([Tweet class]) inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *userFilter = [NSPredicate predicateWithFormat:@"SELF.user.username == %@", self.currentUsername];
+    [fetchRequest setPredicate:userFilter];
+
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
@@ -222,7 +219,7 @@
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Master"];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     
