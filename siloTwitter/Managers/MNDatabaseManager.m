@@ -25,7 +25,7 @@
 - (void)deleteUser: (NSString *)username {
     // remove all data associated with username
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     User *userToDelete = [self findUserForUsername:username];
@@ -41,7 +41,7 @@
 - (void)createUser: (NSString *)username withName: (NSString *)fullName {
     NSError *error = nil;
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     User *newUser = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([User class]) inManagedObjectContext:moc];
@@ -87,7 +87,7 @@
 
     NSError *error = nil;
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     tweets = [moc executeFetchRequest:request error:&error];
@@ -108,7 +108,7 @@
     [request setPredicate:userFilter];
 
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     NSArray *results = [moc executeFetchRequest:request error:&error];
@@ -119,7 +119,7 @@
 
 -(void)saveTweet:(UserTweet *)userTweet {
     AppDelegate *app = (AppDelegate *) [[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.managedObjectContext.persistentStoreCoordinator];
 
     User *user = [self findUserForUsername:userTweet.username];
@@ -127,10 +127,11 @@
         // send out a notification that
         return;
     }
+    NSManagedObjectID *userContextId = [user objectID];
 
     // now that we have a valid user create the tweet and save it to the database
     Tweet *tweet = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([Tweet class]) inManagedObjectContext:moc];
-    tweet.user = user;
+    tweet.user = [moc objectRegisteredForID:userContextId];
     tweet.message = userTweet.message;
 
     if ([userTweet.tags count] > 0) {

@@ -31,22 +31,25 @@ static NSString *testUserFullName = @"Michael Nguyen";
     [request setPredicate:filter];
 
     AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.persistentStoreCoordinator];
 
     NSError *error = nil;
     NSArray *results = [moc executeFetchRequest:request error:&error];
-    if (error != nil || [results count] > 0) {
+    if (error != nil) {
         // if an error happened abort the test
-        XCTFail(@"Failed to setup test properly, database already has test user populated!");
+//        XCTFail(@"Failed to setup test properly, database already has test user populated!");
+        NSLog(@"Test User already exists. \nError:%@", [error localizedDescription]);
     }
 
     // get a handle on the managers
     dbMgr = [app dbManager];
     tweetMgr = [app tweetManager];
 
+    if ([results count] == 0) {
     // create the User in the db
-    [dbMgr createUser:testUserName withName:testUserFullName];
+        [dbMgr createUser:testUserName withName:testUserFullName];
+    }
 
 }
 
@@ -57,7 +60,7 @@ static NSString *testUserFullName = @"Michael Nguyen";
     [request setPredicate:filter];
 
     AppDelegate *app = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    NSManagedObjectContext *moc = app.managedObjectContext;
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] init];
     [moc setPersistentStoreCoordinator: app.persistentStoreCoordinator];
 
     NSError *error = nil;
@@ -67,11 +70,9 @@ static NSString *testUserFullName = @"Michael Nguyen";
         XCTFail(@"Failed to tear down test properly, database is missing test user!");
     }
 
-    [dbMgr deleteUser: testUserName];
-
-    User *testUser = [dbMgr findUserForUsername:testUserName];
-    if (testUser != nil) {
-        // we failed to remove the user instance of the test user!
+    [moc deleteObject: [results firstObject]];
+    if (![moc save: &error ]) {
+        NSLog(@"Failed to remove User from table. \nError: %@", [error localizedDescription]);
     }
 
 }
@@ -104,6 +105,7 @@ static NSString *testUserFullName = @"Michael Nguyen";
     [tweetMgr tweetMessage:userTweet withCompletionBlock:^(id response, NSError *error) {
         if (error == nil) {
             // post was successful
+            XCTAssertEqual(@"Whoopee this is my first Tweet!", [response message]);
             XCTAssertNil(error);
             [postTweet fulfill];
         }

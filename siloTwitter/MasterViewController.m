@@ -5,14 +5,15 @@
 //  Created by Michael Nguyen on 2/25/15.
 //  Copyright (c) 2015 Michael Nguyen. All rights reserved.
 //
-
+#import "TSMessage.h"
+#import "MNTweetManager.h"
 #import "Tweet.h"
-#import "UserTweet.h"
 #import "MasterViewController.h"
 #import "DetailViewController.h"
 
-@interface MasterViewController ()
+@interface MasterViewController () <UIAlertViewDelegate>
 
+@property (nonatomic, copy) NSString *currentUsername;
 @end
 
 @implementation MasterViewController
@@ -30,7 +31,7 @@
     // Do any additional setup after loading the view, typically from a nib.
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
+    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(showTweetInputDialog:)];
     self.navigationItem.rightBarButtonItem = addButton;
     self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
 }
@@ -38,6 +39,37 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)showTweetInputDialog:(id)sender {
+    UIAlertView *popup = [[UIAlertView alloc] initWithTitle:@"Tweet it!" message:@"Tell me your thoughts!" delegate:self cancelButtonTitle:@"Nevermind" otherButtonTitles:@"OK", nil];
+    [popup setAlertViewStyle:UIAlertViewStylePlainTextInput];
+
+
+}
+
+-(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    NSString *buttonTitle = [alertView buttonTitleAtIndex:buttonIndex];
+    if ( [buttonTitle isEqualToString:@"Nevermind"]) {
+
+    } else {
+        // create a new Tweet for this user
+        UserTweet *userTweet = [[UserTweet alloc] init];
+        userTweet.username = self.currentUsername;
+        userTweet.message = [[alertView textFieldAtIndex:0] text];
+        MNTweetManager *mgr = [MNTweetManager sharedManager];
+        [mgr tweetMessage:userTweet withCompletionBlock:^(id response, NSError *error) {
+            if (error == nil) {
+                [TSMessage showNotificationWithTitle:@"Tweet Posted!" subtitle:@"Thanks!" type:TSMessageNotificationTypeSuccess];
+            }
+            else {
+                NSString *errorMessage = [NSString stringWithFormat:@"Tweet Failed to Post!"];
+                [TSMessage showNotificationWithTitle:@"Tweet Failed to Post!" subtitle:errorMessage type:TSMessageNotificationTypeError];
+            }
+
+        }];
+
+    }
 }
 
 - (void)insertNewObject:(id)sender {
@@ -110,15 +142,20 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    NSDate *tweetDate = [object valueForKey:@"timeStamp"];
+    Tweet *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    NSDate *tweetDate = object.timeStamp;
+
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
-    [dateFormat setDateStyle:NSDateFormatterShortStyle];
+    [dateFormat setDateStyle:NSDateFormatterMediumStyle];
     [dateFormat setTimeStyle:NSDateFormatterMediumStyle];
     NSString *dateString = [dateFormat stringFromDate:tweetDate];
 
-    cell.detailTextLabel.text = dateString;
-    cell.textLabel.text = [[object valueForKey:@"message"] description];
+    NSString *message = object.message;
+    NSString *username = [object.user valueForKey:@"username"];
+    NSString *tweet = [NSString stringWithFormat:@"%@", message ];
+
+    cell.textLabel.text = tweet;
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Posted by %@ - on %@", username, dateString];
 }
 
 #pragma mark - Fetched results controller
