@@ -22,7 +22,7 @@
 -(void)saveTweet:(UserTweet *)userTweet;
 -(NSArray *)getAllTweetsForUser: (NSString *)username from: (NSDate *)startTime to: (NSDate *)endTime;
 // CRUD operations for users
--(void)createUser: (NSString *)username withName: (NSString *)fullName;
+- (void)createUser: (NSString *)username withName: (NSString *)fullName andPassword: (NSString *)password;
 -(void)deleteUser: (NSString *)username;
 -(User *)findUserForUsername: (NSString *)username;
 

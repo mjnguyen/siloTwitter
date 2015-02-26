@@ -8,7 +8,29 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MNLoginViewController : UIViewController
+@class MNLoginViewController;
+@protocol MNLoginViewControllerDelegate;
+
+@protocol MNLoginViewControllerDelegate <NSObject>
+
+// The methods declared here are all optional
+@optional
+
+// We name the methods here in a way that explains what the purpose of each message is
+// Each takes a LoginViewController as the first argument, allowing one object to serve
+// as the delegate of many MNLoginViewControllers
+- (void)loginViewControllerDidLoginSuccessfully:(MNLoginViewController *)lvc;
+- (void)loginViewController:(MNLoginViewController *)lvc didFailWithError:(NSError *)error;
+- (void)loginViewControllerDidReceivePasswordResetRequest:(MNLoginViewController *)lvc;
+- (void)loginViewControllerDidRegisterUserSuccessfully:(MNLoginViewController *)lvc;
+
+@end
+
+
+@interface MNLoginViewController : UIViewController <MNLoginViewControllerDelegate>
+
+
+@property (nonatomic, weak) id<MNLoginViewControllerDelegate> delegate;
 
 @property (nonatomic, weak) IBOutlet UILabel *titleLabel;
 @property (nonatomic, weak) IBOutlet UILabel *usernameLabel, *passwordLabel;

@@ -10,8 +10,9 @@
 #import "Tweet.h"
 #import "MasterViewController.h"
 #import "DetailViewController.h"
+#import "MNLoginViewController.h"
 
-@interface MasterViewController () <UIAlertViewDelegate>
+@interface MasterViewController () <UIAlertViewDelegate, MNLoginViewControllerDelegate>
 
 @property (nonatomic, copy) NSString *currentUsername;
 @end
@@ -40,7 +41,8 @@
     if (self.currentUsername == nil) {
         // show login screen
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-        UIViewController *loginController = [storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+        MNLoginViewController *loginController = (MNLoginViewController *) [storyboard instantiateViewControllerWithIdentifier:@"LoginView"];
+        loginController.delegate = self;
         [self.parentViewController presentViewController:loginController animated:YES completion:nil];
     }
 }
@@ -49,6 +51,7 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 
 - (void)showTweetInputDialog:(id)sender {
     UIAlertView *popup = [[UIAlertView alloc] initWithTitle:@"Tweet it!" message:@"Tell me your thoughts!" delegate:self cancelButtonTitle:@"Nevermind" otherButtonTitles:@"OK", nil];
@@ -80,6 +83,31 @@
         }];
 
     }
+}
+
+#pragma mark - MNLoginViewController delegates
+
+-(void)loginViewControllerDidRegisterUserSuccessfully:(MNLoginViewController *)lvc {
+    self.currentUsername = lvc.registerUsernameField.text;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
+    });
+
+}
+
+-(void)loginViewControllerDidReceivePasswordResetRequest:(MNLoginViewController *)lvc {
+    // do something here to handle password resets
+}
+
+-(void)loginViewController:(MNLoginViewController *)lvc didFailWithError:(NSError *)error {
+
+}
+
+-(void)loginViewControllerDidLoginSuccessfully:(MNLoginViewController *)lvc {
+    self.currentUsername = lvc.usernameField.text;
+
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)insertNewObject:(id)sender {
