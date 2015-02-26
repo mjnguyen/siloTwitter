@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "UserTweet.h"
+#import "MNUser.h"
 
 typedef void(^MNTweetResponseBlock)(id response, NSError *error);
 
@@ -19,5 +20,7 @@ typedef void(^MNTweetResponseBlock)(id response, NSError *error);
 
 -(void)getAllTweetsForUser: (NSString *)username from: (NSDate *)startTime to: (NSDate *)endTime withCompletionBlock: (MNTweetResponseBlock)callback;
 
+-(void)registerUser: (MNUser *)newUser withCompletionBlock:(MNTweetResponseBlock)callback;
+-(void)loginUser: (MNUser *)user withCompletionBlock:(MNTweetResponseBlock)callback;
 
 @end
