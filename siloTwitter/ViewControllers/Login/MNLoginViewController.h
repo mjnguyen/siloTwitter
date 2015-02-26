@@ -27,7 +27,7 @@
 @end
 
 
-@interface MNLoginViewController : UIViewController <MNLoginViewControllerDelegate>
+@interface MNLoginViewController : UIViewController <MNLoginViewControllerDelegate, UITextFieldDelegate>
 
 @property (nonatomic, weak) IBOutlet UIActivityIndicatorView *spinner;
 

@@ -71,38 +71,60 @@
 }
 
 -(void)registerUser:(MNUser *)newUser withCompletionBlock:(MNTweetResponseBlock)callback {
-    MNDatabaseManager *mgr = [MNDatabaseManager sharedManager];
-    [mgr createUser:newUser.username withName:newUser.fullname andPassword:newUser.password];
-    if (callback) {
-        callback(newUser, nil);
-    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        MNDatabaseManager *mgr = [MNDatabaseManager sharedManager];
+        NSError *error = nil;
+        MNDatabaseManager *dbManager = [MNDatabaseManager sharedManager];
+
+        if ([dbManager findUserForUsername:newUser.username]) {
+            // user exists, display error message and refocus to username field
+            NSDictionary *errorDetails = @{ @"errorCode": @5000,
+                                            NSLocalizedDescriptionKey: @"Username exists.  Please choose another."
+                                            };
+            error = [NSError errorWithDomain:@"Request Error" code:5000 userInfo:errorDetails];
+
+        }
+        else {
+            [mgr createUser:newUser.username withName:newUser.fullname andPassword:newUser.password];
+        }
+
+        if (callback) {
+            callback(newUser, error);
+        }
+
+    });
+
+
 }
 
 -(void)loginUser:(MNUser *)user withCompletionBlock:(MNTweetResponseBlock)callback {
     // first find the user
-    MNDatabaseManager *mgr = [MNDatabaseManager sharedManager];
-    User *dbUser = [mgr findUserForUsername:user.username];
-    NSDictionary *userInfo = nil;
-    NSError *error = nil;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 
-    if (dbUser == nil) {
-        if (callback) {
-            userInfo = @{ NSLocalizedDescriptionKey: @"User doesn't exist.",
-                                        @"code" : @3000
-                                        };
-            error = [NSError errorWithDomain:@"Login" code:3000 userInfo:userInfo];
+        MNDatabaseManager *mgr = [MNDatabaseManager sharedManager];
+        User *dbUser = [mgr findUserForUsername:user.username];
+        NSDictionary *userInfo = nil;
+        NSError *error = nil;
+
+        if (dbUser == nil) {
+            if (callback) {
+                userInfo = @{ NSLocalizedDescriptionKey: @"User doesn't exist.",
+                              @"code" : @3000
+                              };
+                error = [NSError errorWithDomain:@"Login" code:3000 userInfo:userInfo];
+            }
         }
-    }
 
-    else if (![dbUser.password isEqualToString:user.password]) {
-        userInfo = @{ NSLocalizedDescriptionKey: @"username/password do not match.",
-                      @"code" : @4000
-                      };
-        error = [NSError errorWithDomain:@"Login" code:4000 userInfo:userInfo];
-    }
-    
-    if (callback) {
-        callback(user, error);
-    }
+        else if (![dbUser.password isEqualToString:user.password]) {
+            userInfo = @{ NSLocalizedDescriptionKey: @"username/password do not match.",
+                          @"code" : @4000
+                          };
+            error = [NSError errorWithDomain:@"Login" code:4000 userInfo:userInfo];
+        }
+
+        if (callback) {
+            callback(user, error);
+        }
+    });
 }
 @end
